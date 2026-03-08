@@ -98,7 +98,7 @@ function useAutoScroll(ref, paused) {
   }, [ref, paused]);
 }
 
-const MIN_ZOOM = 1, MAX_ZOOM = 12;
+const MIN_ZOOM = 1, MAX_ZOOM = 24;
 
 export default function App() {
   const [selected,    setSelected]    = useState(null);
@@ -256,16 +256,16 @@ export default function App() {
                     transform={`scale(${pinScale}) translate(0, 5)`}
                     style={{ transformBox:"fill-box", transformOrigin:"center center" }}
                   >
-                    <circle className="ring"  cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="1.5" opacity="0"/>
-                    <circle className="ring2" cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="1.5" opacity="0"/>
-                    <circle className="pin-circle" cx="0" cy="0" r="5"
-                      fill={dest.color} stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"
+                    <circle className="ring"  cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="0.8" opacity="0"/>
+                    <circle className="ring2" cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="0.8" opacity="0"/>
+                    <circle className="pin-circle" cx="0" cy="0" r="4"
+                      fill={dest.color} stroke="rgba(255,255,255,0.8)" strokeWidth="0.5"
                       style={{ filter:`drop-shadow(0 0 3px ${dest.color}bb)` }}
                     />
                     {multiVisit && (
                       <g>
-                        <circle cx="5" cy="-5" r="4.5" fill="#18100a" stroke={dest.color} strokeWidth="1"/>
-                        <text x="5" y="-2.5" textAnchor="middle" fill={dest.color} fontSize="5" fontFamily="Jost,sans-serif" fontWeight="700">{dest.visits.length}</text>
+                        <circle cx="4" cy="-4" r="4" fill="#18100a" stroke={dest.color} strokeWidth=".75"/>
+                        <text x="4" y="-2.5" textAnchor="middle" fill={dest.color} fontSize="5" fontFamily="Jost,sans-serif" fontWeight="700">{dest.visits.length}</text>
                       </g>
                     )}
                   </g>
@@ -426,25 +426,6 @@ export default function App() {
 
             <div style={{ padding:"0.7rem 1.4rem", borderTop:"1px solid rgba(240,230,211,0.06)", fontFamily:"'Jost',sans-serif", fontSize:"11px", color:"rgba(240,230,211,0.22)" }}>
               Photo {photoIdx+1} of {selected.photos.length}
-            </div>
-
-            {/* MINI MAP */}
-            <div style={{ borderTop:"1px solid rgba(240,230,211,0.06)", background:"#160e05" }}>
-              <ComposableMap projection="geoNaturalEarth1" projectionConfig={{ scale:153, center:selected.coords }} style={{ width:"100%", height:150, display:"block" }}>
-                <Geographies geography={GEO_URL}>
-                  {({ geographies }) => geographies.map(geo => (
-                    <Geography key={geo.rsmKey} geography={geo} style={{
-                      default: { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
-                      hover:   { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
-                      pressed: { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
-                    }}/>
-                  ))}
-                </Geographies>
-                <Marker coordinates={selected.coords}>
-                  <circle r="5" fill={selected.color} stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" style={{ filter:`drop-shadow(0 0 5px ${selected.color})` }}/>
-                  <circle r="14" fill="none" stroke={selected.color} strokeWidth="1" opacity="0.35"/>
-                </Marker>
-              </ComposableMap>
             </div>
 
           </div>
