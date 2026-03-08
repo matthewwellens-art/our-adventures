@@ -198,7 +198,7 @@ export default function App() {
                   <g
                     className={`pin-group${isOn ? " on" : ""}`}
                     onClick={() => { if (isOn) { close(); return; } open(dest.visits[dest.visits.length - 1]); }}
-                    transform={`scale(${pinScale}) translate(0, 22)`}
+                    transform={`scale(${pinScale}) translate(0, 15)`}
                     style={{ transformBox:"fill-box", transformOrigin:"center center" }}
                   >
                     <circle className="ring"  cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="1.5" opacity="0"/>
