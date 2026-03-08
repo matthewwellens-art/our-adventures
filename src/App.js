@@ -16,6 +16,7 @@ const TRIPS = [
   { id: "nyc-2024",        name: "New York City",       emoji: "🗽", dates: "November 2024",  sortOrder: 202411, butters: false, coords: [-74.0, 40.7],  color: "#e8c547", photos: ["https://i.imgur.com/uRpXv0o.jpeg","https://i.imgur.com/2TBY18W.jpeg","https://i.imgur.com/E6NGODP.jpeg"] },
   { id: "cincinnati-2024-11", name: "Cincinnati",       emoji: "🏟️", dates: "November 2024",  sortOrder: 202411, butters: true,  coords: [-84.5, 39.1],  color: "#d64045", photos: ["https://i.imgur.com/TjEWsM1.jpeg","https://i.imgur.com/0fqeHIG.jpeg","https://i.imgur.com/uKDncoT.jpeg","https://i.imgur.com/ITtHORk.jpeg"] },
   { id: "assateague",      name: "Assateague Island",   emoji: "🐴", dates: "February 2025",  sortOrder: 202502, butters: true,  coords: [-75.2, 38.0],  color: "#e8a598", photos: ["https://i.imgur.com/FaQAQkC.jpeg","https://i.imgur.com/SgzofGg.jpeg","https://i.imgur.com/TbaYfzT.jpeg","https://i.imgur.com/CHyibR0.jpeg"] },
+  { id: "marblehead",      name: "Marblehead, MA",      emoji: "⚓", dates: "June 2025",       sortOrder: 202506, butters: false, coords: [-70.8, 42.5],  color: "#5eabd4", photos: ["https://i.imgur.com/pVb3ZIZ.jpeg","https://i.imgur.com/x9oXtBG.jpeg"] },
   { id: "scotland",        name: "Scotland & Ireland",  emoji: "🏰", dates: "July 2025",       sortOrder: 202507, butters: false, coords: [-4.5, 55.0],   color: "#4c6fbf", photos: ["https://i.imgur.com/z8Xjt5I.jpeg","https://i.imgur.com/UhoqGU0.jpeg","https://i.imgur.com/SRWVO6h.jpeg","https://i.imgur.com/dANavdY.jpeg","https://i.imgur.com/ZgGgusi.jpeg","https://i.imgur.com/vCC8YtZ.jpeg","https://i.imgur.com/SdPmCaI.jpeg","https://i.imgur.com/5Bz63Ip.jpeg","https://i.imgur.com/QJsVVRY.jpeg","https://i.imgur.com/DNP1HMm.jpeg","https://i.imgur.com/7jFJ1ox.jpeg"] },
   { id: "harpersferry",    name: "Harpers Ferry",       emoji: "🏞️", dates: "August 2025",    sortOrder: 202508, butters: true,  coords: [-77.7, 39.3],  color: "#8fb339", photos: ["https://i.imgur.com/wGWYaWL.jpeg","https://i.imgur.com/9PWtQGT.jpeg","https://i.imgur.com/WyPXTl7.jpeg"] },
   { id: "cincinnati-2025", name: "Cincinnati",          emoji: "🏟️", dates: "August 2025",    sortOrder: 202508, butters: true,  coords: [-84.5, 39.1],  color: "#d64045", photos: ["https://i.imgur.com/6RSvTo4.jpeg","https://i.imgur.com/EtVxzYx.jpeg","https://i.imgur.com/Ulq7Uh5.jpeg"] },
@@ -288,7 +289,7 @@ export default function App() {
                   </h2>
                   <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.73rem", color:"rgba(240,230,211,0.42)", display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
                     <span>{selected.dates}</span>
-                    {selected.butters && <span style={{ display:"flex", alignItems:"center", gap:5, color:"#d4a843" }}><PawPrints size={13}/>Butters was there!</span>}
+                    {selected.butters && <span style={{ display:"flex", alignItems:"center", gap:5, color:"#d4a843" }}><PawPrints size={13}/>Butters was there</span>}
                   </div>
                 </div>
                 <button className="xbtn" onClick={close}>✕</button>
