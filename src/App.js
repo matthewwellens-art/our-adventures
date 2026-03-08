@@ -384,7 +384,7 @@ export default function App() {
                   </h2>
                   <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.73rem", color:"rgba(240,230,211,0.42)", display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
                     <span>{selected.dates}</span>
-                    {selected.butters && <span style={{ display:"flex", alignItems:"center", gap:5, color:"#d4a843" }}><PawPrints size={13}/>Butters was there</span>}
+                    {selected.butters && <span style={{ display:"flex", alignItems:"center", gap:5, color:"#d4a843" }}><PawPrints size={13}/>Butters was there!</span>}
                   </div>
                 </div>
                 <button className="xbtn" onClick={close}>✕</button>
