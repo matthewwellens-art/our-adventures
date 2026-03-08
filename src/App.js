@@ -176,7 +176,7 @@ export default function App() {
 
       {/* MAP */}
       <div style={{ position:"relative", margin:"0 1rem", borderRadius:14, overflow:"hidden", border:"1px solid rgba(240,230,211,0.07)", background:"#1a2535" }}>
-        <ComposableMap projection="geoNaturalEarth1" projectionConfig={{ scale:153, center:[0,0] }} style={{ width:"100%", height:"auto", display:"block" }}>
+        <ComposableMap projection="geoNaturalEarth1" projectionConfig={{ scale:153, center:[0, -15] }} style={{ width:"100%", height:"auto", display:"block" }}>
           <ZoomableGroup zoom={zoom} center={center} minZoom={MIN_ZOOM} maxZoom={MAX_ZOOM}
             onMoveEnd={({ zoom: z, coordinates }) => { setZoom(z); setCenter(coordinates); }}
           >
@@ -198,7 +198,7 @@ export default function App() {
                   <g
                     className={`pin-group${isOn ? " on" : ""}`}
                     onClick={() => { if (isOn) { close(); return; } open(dest.visits[dest.visits.length - 1]); }}
-                    transform={`scale(${pinScale})`}
+                    transform={`scale(${pinScale}) translate(0, 22)`}
                     style={{ transformBox:"fill-box", transformOrigin:"center center" }}
                   >
                     <circle className="ring"  cx="0" cy="0" r="7" fill="none" stroke={dest.color} strokeWidth="1.5" opacity="0"/>
