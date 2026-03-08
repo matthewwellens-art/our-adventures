@@ -15,6 +15,7 @@ const TRIPS = [
   { id: "chicago",         name: "Chicago",             emoji: "🏙️", dates: "August 2024",    sortOrder: 202408, butters: false, coords: [-87.6, 41.8],  color: "#3aafa9", photos: ["https://i.imgur.com/ZTCFS6G.jpeg","https://i.imgur.com/H5ruBmM.jpeg","https://i.imgur.com/d5OC5x2.jpeg"] },
   { id: "nyc-2024",        name: "New York City",       emoji: "🗽", dates: "November 2024",  sortOrder: 202411, butters: false, coords: [-74.0, 40.7],  color: "#e8c547", photos: ["https://i.imgur.com/uRpXv0o.jpeg","https://i.imgur.com/2TBY18W.jpeg","https://i.imgur.com/E6NGODP.jpeg"] },
   { id: "cincinnati-2024-11", name: "Cincinnati",       emoji: "🏟️", dates: "November 2024",  sortOrder: 202411, butters: true,  coords: [-84.5, 39.1],  color: "#d64045", photos: ["https://i.imgur.com/TjEWsM1.jpeg","https://i.imgur.com/0fqeHIG.jpeg","https://i.imgur.com/uKDncoT.jpeg","https://i.imgur.com/ITtHORk.jpeg"] },
+  { id: "parkcity",        name: "Park City",           emoji: "⛷️", dates: "December 2024",  sortOrder: 202412, butters: false, coords: [-111.5, 40.6],  color: "#7eb8d4", photos: ["https://i.imgur.com/feHKADL.jpeg","https://i.imgur.com/RSDT0lc.jpeg"] },
   { id: "assateague",      name: "Assateague Island",   emoji: "🐴", dates: "February 2025",  sortOrder: 202502, butters: true,  coords: [-75.2, 38.0],  color: "#e8a598", photos: ["https://i.imgur.com/FaQAQkC.jpeg","https://i.imgur.com/SgzofGg.jpeg","https://i.imgur.com/TbaYfzT.jpeg","https://i.imgur.com/CHyibR0.jpeg"] },
   { id: "marblehead",      name: "Marblehead, MA",      emoji: "⚓", dates: "June 2025",       sortOrder: 202506, butters: false, coords: [-70.8, 42.5],  color: "#5eabd4", photos: ["https://i.imgur.com/pVb3ZIZ.jpeg","https://i.imgur.com/x9oXtBG.jpeg"] },
   { id: "scotland",        name: "Scotland & Ireland",  emoji: "🏰", dates: "July 2025",       sortOrder: 202507, butters: false, coords: [-4.5, 55.0],   color: "#4c6fbf", photos: ["https://i.imgur.com/z8Xjt5I.jpeg","https://i.imgur.com/UhoqGU0.jpeg","https://i.imgur.com/SRWVO6h.jpeg","https://i.imgur.com/dANavdY.jpeg","https://i.imgur.com/ZgGgusi.jpeg","https://i.imgur.com/vCC8YtZ.jpeg","https://i.imgur.com/SdPmCaI.jpeg","https://i.imgur.com/5Bz63Ip.jpeg","https://i.imgur.com/QJsVVRY.jpeg","https://i.imgur.com/DNP1HMm.jpeg","https://i.imgur.com/7jFJ1ox.jpeg"] },
@@ -27,10 +28,10 @@ const TRIPS = [
   { id: "jordan",          name: "Jordan",              emoji: "🕌", dates: "November 2025",  sortOrder: 202511, butters: false, coords: [35.9, 31.9],   color: "#c8924a", photos: ["https://i.imgur.com/8LVDsP1.jpeg","https://i.imgur.com/MB5wrgh.jpeg","https://i.imgur.com/bXupcME.jpeg","https://i.imgur.com/NWVaRRv.jpeg","https://i.imgur.com/9S9By4C.jpeg","https://i.imgur.com/k7Cle79.jpeg","https://i.imgur.com/qdM2dDl.jpeg"] },
   { id: "bangalore",       name: "Bangalore, India",    emoji: "🪷", dates: "November 2025",  sortOrder: 202511, butters: false, coords: [77.6, 12.9],   color: "#c2557a", photos: ["https://i.imgur.com/962RcTt.jpeg","https://i.imgur.com/V2hBtuj.jpeg","https://i.imgur.com/G6KEkgb.jpeg","https://i.imgur.com/l4XcLKO.jpeg"] },
   { id: "phoenix-2025",    name: "Phoenix",             emoji: "🌵", dates: "December 2025",  sortOrder: 202512, butters: false, coords: [-112.0, 33.4], color: "#e07b39", photos: ["https://i.imgur.com/LLYMBbU.jpeg","https://i.imgur.com/bw6bfg4.jpeg","https://i.imgur.com/FMVZ3uY.jpeg"] },
+  { id: "moorestown",      name: "Moorestown, NJ",      emoji: "🎄", dates: "December 2025",  sortOrder: 202512, butters: false, coords: [-74.9, 39.9],  color: "#7ab87a", photos: ["https://i.imgur.com/Cy8Mus7.jpeg","https://i.imgur.com/Neztmdk.jpeg","https://i.imgur.com/2aOckNl.jpeg","https://i.imgur.com/HBHPZmn.jpeg"] },
   { id: "cincinnati-2026", name: "Cincinnati",          emoji: "🏟️", dates: "January 2026",  sortOrder: 202601, butters: false, coords: [-84.5, 39.1],  color: "#d64045", photos: ["https://i.imgur.com/djizLIj.jpeg"] },
 ];
 
-// Group trips by location — each destination has a sorted visits array
 const DESTINATIONS = Object.values(
   TRIPS.reduce((acc, t) => {
     const key = t.coords.toString();
@@ -39,6 +40,28 @@ const DESTINATIONS = Object.values(
     return acc;
   }, {})
 ).map(d => ({ ...d, visits: d.visits.sort((a, b) => a.sortOrder - b.sortOrder) }));
+
+function distanceMiles([lng1, lat1], [lng2, lat2]) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+const TOTAL_MILES = (() => {
+  const sorted = [...TRIPS].sort((a, b) => a.sortOrder - b.sortOrder);
+  let total = 0;
+  for (let i = 1; i < sorted.length; i++) total += distanceMiles(sorted[i-1].coords, sorted[i].coords);
+  return Math.round(total).toLocaleString();
+})();
+
+const TRIPS_BY_YEAR = [...TRIPS].sort((a,b) => a.sortOrder - b.sortOrder).reduce((acc, t) => {
+  const year = String(t.sortOrder).slice(0,4);
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(t);
+  return acc;
+}, {});
 
 function PawPrints({ size = 22 }) {
   return (
@@ -77,20 +100,33 @@ function useAutoScroll(ref, paused) {
 const MIN_ZOOM = 1, MAX_ZOOM = 12;
 
 export default function App() {
-  const [selected, setSelected] = useState(null);
-  const [visitIdx, setVisitIdx] = useState(0);
-  const [photoIdx, setPhotoIdx] = useState(0);
-  const [closing,  setClosing]  = useState(false);
-  const [zoom,     setZoom]     = useState(1);
-  const [center,   setCenter]   = useState([10, 10]);
+  const [selected,    setSelected]    = useState(null);
+  const [visitIdx,    setVisitIdx]    = useState(0);
+  const [photoIdx,    setPhotoIdx]    = useState(0);
+  const [closing,     setClosing]     = useState(false);
+  const [zoom,        setZoom]        = useState(1);
+  const [center,      setCenter]      = useState([10, 10]);
+  const [buttersOnly, setButtersOnly] = useState(false);
+  const [hoveredPin,  setHoveredPin]  = useState(null);
   const filmRef      = useRef(null);
   const scrollPaused = useRef(false);
+  const touchStartX  = useRef(null);
 
   useAutoScroll(filmRef, scrollPaused);
 
-  const selectedDest  = selected ? DESTINATIONS.find(d => d.coords.toString() === selected.coords.toString()) : null;
-  const visits        = selectedDest?.visits ?? [];
-  const isMultiVisit  = visits.length > 1;
+  const selectedDest = selected ? DESTINATIONS.find(d => d.coords.toString() === selected.coords.toString()) : null;
+  const visits       = selectedDest?.visits ?? [];
+  const isMultiVisit = visits.length > 1;
+
+  const visibleTrips = buttersOnly ? TRIPS.filter(t => t.butters) : TRIPS;
+  const visibleDests = buttersOnly
+    ? Object.values(visibleTrips.reduce((acc, t) => {
+        const key = t.coords.toString();
+        if (!acc[key]) acc[key] = { ...t, visits: [] };
+        acc[key].visits.push(t);
+        return acc;
+      }, {})).map(d => ({ ...d, visits: d.visits.sort((a,b) => a.sortOrder - b.sortOrder) }))
+    : DESTINATIONS;
 
   const open = useCallback((trip) => {
     const dest = DESTINATIONS.find(d => d.coords.toString() === trip.coords.toString());
@@ -108,11 +144,18 @@ export default function App() {
   const zoomIn    = () => setZoom(z => Math.min(z * 2, MAX_ZOOM));
   const zoomOut   = () => setZoom(z => Math.max(z / 2, MIN_ZOOM));
   const resetZoom = () => { setZoom(1); setCenter([10, 10]); };
+  const pinScale  = 1 / Math.sqrt(zoom);
 
-  const pinScale = 1 / Math.sqrt(zoom);
+  const prevPhoto = () => setPhotoIdx(i => (i - 1 + selected.photos.length) % selected.photos.length);
+  const nextPhoto = () => setPhotoIdx(i => (i + 1) % selected.photos.length);
 
-  const chronological = [...TRIPS].sort((a, b) => a.sortOrder - b.sortOrder);
+  const chronological = [...visibleTrips].sort((a, b) => a.sortOrder - b.sortOrder);
   const looped = [...chronological, ...chronological];
+
+  const visibleByYear = Object.entries(TRIPS_BY_YEAR).map(([year, trips]) => ({
+    year,
+    trips: buttersOnly ? trips.filter(t => t.butters) : trips,
+  })).filter(({ trips }) => trips.length > 0);
 
   return (
     <div style={{ minHeight:"100vh", background:"#18100a", color:"#f0e6d3", display:"flex", flexDirection:"column" }}>
@@ -128,9 +171,6 @@ export default function App() {
         .ring2 { animation:ripple 3s ease-out 1.2s infinite; }
         @keyframes ripple { 0%{r:7;opacity:0.5} 100%{r:18;opacity:0} }
 
-        .tip { opacity:0; transition:opacity 0.15s; pointer-events:none; }
-        .pin-group:hover .tip { opacity:1; }
-
         .strip { display:flex; gap:10px; overflow:hidden; padding:14px 0 18px; user-select:none; }
         .card { flex-shrink:0; width:136px; border-radius:10px; overflow:hidden; cursor:pointer; transition:all 0.22s; border:1px solid rgba(240,230,211,0.07); background:rgba(255,255,255,0.03); }
         .card:hover { transform:translateY(-5px); background:rgba(255,255,255,0.07); border-color:rgba(240,230,211,0.2); }
@@ -144,7 +184,11 @@ export default function App() {
         .tab-btn:hover { background:rgba(255,255,255,0.1); color:#f0e6d3; }
         .tab-btn.active { background:rgba(200,169,110,0.18); border-color:rgba(200,169,110,0.5); color:#f0e6d3; }
 
-        .mbg { position:fixed; inset:0; background:rgba(12,7,3,0.88); backdrop-filter:blur(12px); z-index:300; display:flex; align-items:center; justify-content:center; padding:1.5rem; animation:fi 0.22s ease; }
+        .butters-toggle { display:flex; align-items:center; gap:7px; padding:6px 14px; border-radius:20px; border:1px solid rgba(212,168,67,0.3); background:rgba(212,168,67,0.07); color:rgba(240,230,211,0.55); font-family:'Jost',sans-serif; font-size:0.7rem; cursor:pointer; transition:all 0.2s; }
+        .butters-toggle:hover { background:rgba(212,168,67,0.14); color:#f0e6d3; }
+        .butters-toggle.active { background:rgba(212,168,67,0.2); border-color:#d4a843; color:#d4a843; }
+
+        .mbg { position:fixed; inset:0; background:rgba(12,7,3,0.88); backdrop-filter:blur(12px); z-index:300; display:flex; align-items:center; justify-content:center; padding:1.5rem; animation:fi 0.22s ease; overflow-y:auto; }
         .mbg.out { animation:fo 0.28s ease forwards; }
         .mbox { width:100%; max-width:580px; background:#1f1208; border:1px solid rgba(240,230,211,0.1); border-radius:18px; overflow:hidden; box-shadow:0 32px 90px rgba(0,0,0,0.75); animation:mi 0.28s cubic-bezier(0.34,1.2,0.64,1); }
         .mbg.out .mbox { animation:mo 0.28s ease forwards; }
@@ -158,6 +202,9 @@ export default function App() {
         .nbtn:hover { background:rgba(18,10,4,0.92); }
         .xbtn { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); color:rgba(240,230,211,0.6); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; }
         .xbtn:hover { background:rgba(255,255,255,0.15); color:white; }
+
+        .tl-card { display:flex; gap:12px; align-items:center; padding:8px 10px; border-radius:10px; cursor:pointer; transition:background 0.18s; }
+        .tl-card:hover { background:rgba(255,255,255,0.05); }
       `}</style>
 
       {/* HEADER */}
@@ -168,9 +215,15 @@ export default function App() {
         </h1>
         <div style={{ width:50, height:1, background:"linear-gradient(90deg,transparent,rgba(212,158,67,0.55),transparent)", margin:"0.8rem auto" }} />
         <div style={{ display:"flex", gap:"1.2rem", justifyContent:"center", fontFamily:"'Jost',sans-serif", fontSize:"0.72rem", color:"rgba(240,230,211,0.38)", flexWrap:"wrap", alignItems:"center" }}>
+          <span>🧳 {TRIPS.length} trips</span>
           <span>📍 {DESTINATIONS.length} destinations</span>
           <span>✈️ 3 continents</span>
           <span style={{ display:"flex", alignItems:"center", gap:5 }}><PawPrints size={12}/> {TRIPS.filter(t=>t.butters).length} Butters adventures</span>
+        </div>
+        <div style={{ marginTop:"0.9rem", display:"flex", justifyContent:"center" }}>
+          <button className={`butters-toggle${buttersOnly ? " active" : ""}`} onClick={() => setButtersOnly(b => !b)}>
+            <PawPrints size={13}/> {buttersOnly ? "Showing Butters trips" : "Butters only"}
+          </button>
         </div>
       </div>
 
@@ -189,8 +242,7 @@ export default function App() {
                 }}/>
               ))}
             </Geographies>
-
-            {DESTINATIONS.map(dest => {
+            {visibleDests.map(dest => {
               const isOn       = dest.visits.some(v => v.id === selected?.id);
               const multiVisit = dest.visits.length > 1;
               return (
@@ -198,6 +250,8 @@ export default function App() {
                   <g
                     className={`pin-group${isOn ? " on" : ""}`}
                     onClick={() => { if (isOn) { close(); return; } open(dest.visits[dest.visits.length - 1]); }}
+                    onMouseEnter={() => setHoveredPin(dest.id)}
+                    onMouseLeave={() => setHoveredPin(null)}
                     transform={`scale(${pinScale}) translate(0, 5)`}
                     style={{ transformBox:"fill-box", transformOrigin:"center center" }}
                   >
@@ -213,20 +267,28 @@ export default function App() {
                         <text x="5" y="-2.5" textAnchor="middle" fill={dest.color} fontSize="5" fontFamily="Jost,sans-serif" fontWeight="700">{dest.visits.length}</text>
                       </g>
                     )}
-                    <g className="tip">
-                      <rect x="-48" y="-36" width="96" height="26" rx="5" fill="rgba(24,16,10,0.94)" stroke="rgba(240,230,211,0.22)" strokeWidth="0.8"/>
-                      <text x="0" y="-19" textAnchor="middle" fill="#f0e6d3" fontSize="12" fontFamily="Jost, sans-serif" fontWeight="500">
-                        {dest.name}{dest.visits.some(v=>v.butters) ? " 🐾" : ""}
-                      </text>
-                    </g>
                   </g>
                 </Marker>
               );
             })}
+
+            {/* TOOLTIP OVERLAY — rendered last so it's always on top */}
+            {hoveredPin && (() => {
+              const dest = visibleDests.find(d => d.id === hoveredPin);
+              if (!dest) return null;
+              const label = dest.name + (dest.visits.some(v=>v.butters) ? " 🐾" : "");
+              const boxW = Math.max(90, label.length * 7.5);
+              return (
+                <Marker coordinates={dest.coords}>
+                  <g transform={`scale(${pinScale}) translate(0, 5)`} style={{ pointerEvents:"none" }}>
+                    <rect x={-boxW/2} y="-38" width={boxW} height="26" rx="5" fill="rgba(24,16,10,0.97)" stroke="rgba(240,230,211,0.28)" strokeWidth="0.8"/>
+                    <text x="0" y="-21" textAnchor="middle" fill="#f0e6d3" fontSize="11" fontFamily="Jost, sans-serif" fontWeight="500">{label}</text>
+                  </g>
+                </Marker>
+              );
+            })()}
           </ZoomableGroup>
         </ComposableMap>
-
-        {/* ZOOM CONTROLS */}
         <div style={{ position:"absolute", bottom:14, right:14, display:"flex", flexDirection:"column", gap:6, zIndex:10 }}>
           <button className="zoom-btn" onClick={zoomIn}   disabled={zoom >= MAX_ZOOM} title="Zoom in">+</button>
           <button className="zoom-btn" onClick={zoomOut}  disabled={zoom <= MIN_ZOOM} title="Zoom out">−</button>
@@ -237,7 +299,6 @@ export default function App() {
             Drag to pan · Scroll to zoom
           </div>
         )}
-
         <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at center, transparent 50%, rgba(24,16,10,0.55) 100%)", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(24,16,10,0.2) 0%,transparent 20%,transparent 80%,rgba(24,16,10,0.3) 100%)", pointerEvents:"none" }}/>
       </div>
@@ -259,12 +320,14 @@ export default function App() {
                 style={{ borderColor: on ? t.color : undefined, boxShadow: on ? `0 0 16px ${t.color}44` : undefined }}
                 onClick={() => on ? close() : open(t)}
               >
-                <div style={{ height:4, background:t.color, opacity: on?1:0.45, transition:"opacity 0.2s" }}/>
-                <div style={{ padding:"10px 10px 12px" }}>
-                  <div style={{ fontSize:"1.3rem", lineHeight:1, marginBottom:5 }}>{t.emoji}</div>
-                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.82rem", fontWeight:600, color:"#f0e6d3", lineHeight:1.25, marginBottom:4 }}>{t.name}</div>
+                <div style={{ width:"100%", height:80, overflow:"hidden", background:"#0e0804" }}>
+                  <img src={t.photos[0]} alt={t.name} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", opacity: on ? 1 : 0.78, transition:"opacity 0.2s" }}/>
+                </div>
+                <div style={{ height:3, background:t.color, opacity: on?1:0.45, transition:"opacity 0.2s" }}/>
+                <div style={{ padding:"8px 10px 10px" }}>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"0.82rem", fontWeight:600, color:"#f0e6d3", lineHeight:1.25, marginBottom:3 }}>{t.emoji} {t.name}</div>
                   <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.62rem", color:"rgba(240,230,211,0.38)", marginBottom: t.butters?5:0 }}>{t.dates}</div>
-                  {t.butters && <PawPrints size={14}/>}
+                  {t.butters && <PawPrints size={13}/>}
                 </div>
               </div>
             );
@@ -272,8 +335,39 @@ export default function App() {
         </div>
       </div>
 
+      {/* TIMELINE */}
+      <div style={{ margin:"1.5rem 1rem 0", borderTop:"1px solid rgba(240,230,211,0.07)", paddingTop:"1.5rem" }}>
+        <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.62rem", letterSpacing:"0.3em", textTransform:"uppercase", color:"rgba(240,230,211,0.25)", marginBottom:"1.4rem", textAlign:"center" }}>Journey so far</p>
+        <div style={{ display:"flex", flexDirection:"column", gap:"2rem" }}>
+          {visibleByYear.map(({ year, trips: yearTrips }) => (
+            <div key={year}>
+              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"0.5rem" }}>
+                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1.3rem", fontWeight:600, color:"rgba(240,230,211,0.28)" }}>{year}</div>
+                <div style={{ flex:1, height:1, background:"rgba(240,230,211,0.07)" }}/>
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+                {yearTrips.map(t => (
+                  <div key={t.id} className="tl-card" onClick={() => selected?.id === t.id ? close() : open(t)}>
+                    <div style={{ position:"relative", flexShrink:0 }}>
+                      <img src={t.photos[0]} alt={t.name} style={{ width:56, height:56, borderRadius:8, objectFit:"cover", display:"block" }}/>
+                      <div style={{ position:"absolute", inset:0, borderRadius:8, border:`2px solid ${t.color}`, opacity: selected?.id === t.id ? 1 : 0.35 }}/>
+                    </div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1rem", fontWeight:600, color:"#f0e6d3", lineHeight:1.2 }}>{t.emoji} {t.name}</div>
+                      <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.63rem", color:"rgba(240,230,211,0.35)", marginTop:2 }}>{t.dates}</div>
+                      {t.butters && <div style={{ marginTop:4 }}><PawPrints size={11}/></div>}
+                    </div>
+                    <div style={{ width:3, borderRadius:2, alignSelf:"stretch", background:t.color, opacity:0.5, flexShrink:0 }}/>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* FOOTER */}
-      <div style={{ textAlign:"center", padding:"0.8rem 1rem 1rem", fontFamily:"'Jost',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"rgba(240,230,211,0.18)", textTransform:"uppercase" }}>
+      <div style={{ textAlign:"center", padding:"2rem 1rem 1.5rem", fontFamily:"'Jost',sans-serif", fontSize:"0.6rem", letterSpacing:"0.12em", color:"rgba(240,230,211,0.18)", textTransform:"uppercase" }}>
         Made with love · Click any pin or card to explore
       </div>
 
@@ -294,8 +388,6 @@ export default function App() {
                 </div>
                 <button className="xbtn" onClick={close}>✕</button>
               </div>
-
-              {/* TRIP TABS — only for multi-visit destinations */}
               {isMultiVisit && (
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                   {visits.map((v, i) => (
@@ -307,13 +399,22 @@ export default function App() {
               )}
             </div>
 
-            <div style={{ position:"relative", background:"#0e0804" }}>
+            {/* PHOTO — swipe supported */}
+            <div style={{ position:"relative", background:"#0e0804" }}
+              onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
+              onTouchEnd={e => {
+                if (touchStartX.current === null) return;
+                const diff = touchStartX.current - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 40) diff > 0 ? nextPhoto() : prevPhoto();
+                touchStartX.current = null;
+              }}
+            >
               <img key={`${selected.id}-${photoIdx}`} src={selected.photos[photoIdx]} alt={`${selected.name} ${photoIdx+1}`}
-                style={{ width:"100%", maxHeight:"70vh", objectFit:"contain", display:"block", background:"#0e0804", animation:"fi 0.2s ease" }}
+                style={{ width:"100%", maxHeight:"60vh", objectFit:"contain", display:"block", background:"#0e0804", animation:"fi 0.2s ease" }}
               />
               {selected.photos.length > 1 && <>
-                <button className="nbtn" style={{ left:12 }} onClick={() => setPhotoIdx(i=>(i-1+selected.photos.length)%selected.photos.length)}>‹</button>
-                <button className="nbtn" style={{ right:12 }} onClick={() => setPhotoIdx(i=>(i+1)%selected.photos.length)}>›</button>
+                <button className="nbtn" style={{ left:12 }} onClick={prevPhoto}>‹</button>
+                <button className="nbtn" style={{ right:12 }} onClick={nextPhoto}>›</button>
                 <div style={{ position:"absolute", bottom:12, left:"50%", transform:"translateX(-50%)", display:"flex", gap:6 }}>
                   {selected.photos.map((_,i) => (
                     <button key={i} onClick={() => setPhotoIdx(i)} style={{ width:i===photoIdx?22:8, height:8, borderRadius:4, background:i===photoIdx?selected.color:"rgba(255,255,255,0.32)", border:"none", cursor:"pointer", padding:0, transition:"all 0.2s" }}/>
@@ -325,6 +426,26 @@ export default function App() {
             <div style={{ padding:"0.7rem 1.4rem", borderTop:"1px solid rgba(240,230,211,0.06)", fontFamily:"'Jost',sans-serif", fontSize:"11px", color:"rgba(240,230,211,0.22)" }}>
               Photo {photoIdx+1} of {selected.photos.length}
             </div>
+
+            {/* MINI MAP */}
+            <div style={{ borderTop:"1px solid rgba(240,230,211,0.06)", background:"#160e05" }}>
+              <ComposableMap projection="geoNaturalEarth1" projectionConfig={{ scale:153, center:selected.coords }} style={{ width:"100%", height:150, display:"block" }}>
+                <Geographies geography={GEO_URL}>
+                  {({ geographies }) => geographies.map(geo => (
+                    <Geography key={geo.rsmKey} geography={geo} style={{
+                      default: { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
+                      hover:   { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
+                      pressed: { fill:"#253520", stroke:"#35482f", strokeWidth:0.5, outline:"none" },
+                    }}/>
+                  ))}
+                </Geographies>
+                <Marker coordinates={selected.coords}>
+                  <circle r="5" fill={selected.color} stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" style={{ filter:`drop-shadow(0 0 5px ${selected.color})` }}/>
+                  <circle r="14" fill="none" stroke={selected.color} strokeWidth="1" opacity="0.35"/>
+                </Marker>
+              </ComposableMap>
+            </div>
+
           </div>
         </div>
       )}
