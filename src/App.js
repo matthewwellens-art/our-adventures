@@ -101,14 +101,15 @@ function useAutoScroll(ref, paused) {
 const MIN_ZOOM = 1, MAX_ZOOM = 24;
 
 export default function App() {
-  const [selected,    setSelected]    = useState(null);
-  const [visitIdx,    setVisitIdx]    = useState(0);
-  const [photoIdx,    setPhotoIdx]    = useState(0);
-  const [closing,     setClosing]     = useState(false);
-  const [zoom,        setZoom]        = useState(1);
-  const [center,      setCenter]      = useState([10, 10]);
-  const [buttersOnly, setButtersOnly] = useState(false);
-  const [hoveredPin,  setHoveredPin]  = useState(null);
+  const [selected,       setSelected]       = useState(null);
+  const [visitIdx,       setVisitIdx]       = useState(0);
+  const [photoIdx,       setPhotoIdx]       = useState(0);
+  const [closing,        setClosing]        = useState(false);
+  const [zoom,           setZoom]           = useState(1);
+  const [center,         setCenter]         = useState([10, 10]);
+  const [buttersOnly,    setButtersOnly]    = useState(false);
+  const [hoveredPin,     setHoveredPin]     = useState(null);
+  const [collapsedYears, setCollapsedYears] = useState({});
   const filmRef      = useRef(null);
   const scrollPaused = useRef(false);
   const touchStartX  = useRef(null);
@@ -158,6 +159,10 @@ export default function App() {
     trips: buttersOnly ? trips.filter(t => t.butters) : trips,
   })).filter(({ trips }) => trips.length > 0);
 
+  const toggleYear = (year) => {
+    setCollapsedYears(prev => ({ ...prev, [year]: !prev[year] }));
+  };
+
   return (
     <div style={{ minHeight:"100vh", background:"#18100a", color:"#f0e6d3", display:"flex", flexDirection:"column" }}>
       <style>{`
@@ -206,6 +211,17 @@ export default function App() {
 
         .tl-card { display:flex; gap:12px; align-items:center; padding:8px 10px; border-radius:10px; cursor:pointer; transition:background 0.18s; }
         .tl-card:hover { background:rgba(255,255,255,0.05); }
+
+        .year-header { display:flex; align-items:center; gap:12px; margin-bottom:0.5rem; cursor:pointer; user-select:none; border-radius:8px; padding:4px 6px; transition:background 0.15s; }
+        .year-header:hover { background:rgba(255,255,255,0.04); }
+
+        .year-chevron { color:rgba(240,230,211,0.3); font-size:0.7rem; transition:transform 0.25s ease; flex-shrink:0; }
+        .year-chevron.open { transform:rotate(0deg); }
+        .year-chevron.closed { transform:rotate(-90deg); }
+
+        .year-trips { overflow:hidden; transition:max-height 0.3s ease, opacity 0.25s ease; }
+        .year-trips.open { max-height:2000px; opacity:1; }
+        .year-trips.closed { max-height:0; opacity:0; }
       `}</style>
 
       {/* HEADER */}
@@ -340,30 +356,37 @@ export default function App() {
       <div style={{ margin:"1.5rem 1rem 0", borderTop:"1px solid rgba(240,230,211,0.07)", paddingTop:"1.5rem" }}>
         <p style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.62rem", letterSpacing:"0.3em", textTransform:"uppercase", color:"rgba(240,230,211,0.25)", marginBottom:"1.4rem", textAlign:"center" }}>Journey so far</p>
         <div style={{ display:"flex", flexDirection:"column", gap:"2rem" }}>
-          {visibleByYear.map(({ year, trips: yearTrips }) => (
-            <div key={year}>
-              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"0.5rem" }}>
-                <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1.3rem", fontWeight:600, color:"rgba(240,230,211,0.28)" }}>{year}</div>
-                <div style={{ flex:1, height:1, background:"rgba(240,230,211,0.07)" }}/>
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
-                {yearTrips.map(t => (
-                  <div key={t.id} className="tl-card" onClick={() => selected?.id === t.id ? close() : open(t)}>
-                    <div style={{ position:"relative", flexShrink:0 }}>
-                      <img src={t.photos[0]} alt={t.name} style={{ width:56, height:56, borderRadius:8, objectFit:"cover", display:"block" }}/>
-                      <div style={{ position:"absolute", inset:0, borderRadius:8, border:`2px solid ${t.color}`, opacity: selected?.id === t.id ? 1 : 0.35 }}/>
-                    </div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1rem", fontWeight:600, color:"#f0e6d3", lineHeight:1.2 }}>{t.emoji} {t.name}</div>
-                      <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.63rem", color:"rgba(240,230,211,0.35)", marginTop:2 }}>{t.dates}</div>
-                      {t.butters && <div style={{ marginTop:4 }}><PawPrints size={11}/></div>}
-                    </div>
-                    <div style={{ width:3, borderRadius:2, alignSelf:"stretch", background:t.color, opacity:0.5, flexShrink:0 }}/>
+          {visibleByYear.map(({ year, trips: yearTrips }) => {
+            const isCollapsed = !!collapsedYears[year];
+            return (
+              <div key={year}>
+                <div className="year-header" onClick={() => toggleYear(year)}>
+                  <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1.3rem", fontWeight:600, color:"rgba(240,230,211,0.28)" }}>{year}</div>
+                  <div style={{ flex:1, height:1, background:"rgba(240,230,211,0.07)" }}/>
+                  <span style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.6rem", color:"rgba(240,230,211,0.2)", letterSpacing:"0.05em" }}>{yearTrips.length} trip{yearTrips.length !== 1 ? "s" : ""}</span>
+                  <span className={`year-chevron ${isCollapsed ? "closed" : "open"}`}>▼</span>
+                </div>
+                <div className={`year-trips ${isCollapsed ? "closed" : "open"}`}>
+                  <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+                    {yearTrips.map(t => (
+                      <div key={t.id} className="tl-card" onClick={() => selected?.id === t.id ? close() : open(t)}>
+                        <div style={{ position:"relative", flexShrink:0 }}>
+                          <img src={t.photos[0]} alt={t.name} style={{ width:56, height:56, borderRadius:8, objectFit:"cover", display:"block" }}/>
+                          <div style={{ position:"absolute", inset:0, borderRadius:8, border:`2px solid ${t.color}`, opacity: selected?.id === t.id ? 1 : 0.35 }}/>
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontFamily:"'Cormorant Garamond',serif", fontStyle:"italic", fontSize:"1rem", fontWeight:600, color:"#f0e6d3", lineHeight:1.2 }}>{t.emoji} {t.name}</div>
+                          <div style={{ fontFamily:"'Jost',sans-serif", fontSize:"0.63rem", color:"rgba(240,230,211,0.35)", marginTop:2 }}>{t.dates}</div>
+                          {t.butters && <div style={{ marginTop:4 }}><PawPrints size={11}/></div>}
+                        </div>
+                        <div style={{ width:3, borderRadius:2, alignSelf:"stretch", background:t.color, opacity:0.5, flexShrink:0 }}/>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
